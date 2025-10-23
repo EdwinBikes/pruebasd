@@ -1,314 +1,137 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Datos de ejemplo: ahora incluyen los tres enlaces que pediste (YouTube / Shorts / Instagram).
-  // Para YouTube/Instagram se usa embedding (iframe) en el modal; en la galería mostramos miniaturas.
-  const mediaItems = [
+   const mediaItems = [
     { id: 1, type: 'image', src: 'https://picsum.photos/seed/filmmaker1/800/600', title: 'Amanecer en las montañas', description: 'Una toma matutina capturando la niebla y los primeros rayos.' },
-    { id: 2, type: 'video', src: 'https://youtu.be/mTlmzbWW0fI?si=ab5J25dSjL8XEHCo', title: 'YouTube Video 1', description: 'YouTube link que abriremos en modal embebido.' },
+    {
+      id: 2,
+      type: 'embed',
+      title: 'YouTube Embed 1',
+      description: 'Embed directo de YouTube (iframe)',
+      embedHtml: `<iframe width="560" height="315" src="https://www.youtube.com/embed/mTlmzbWW0fI?si=L5SZjqZsSzSHRkIl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
+    },
     { id: 3, type: 'image', src: 'https://picsum.photos/seed/filmmaker3/800/600', title: 'Jungla Urbana', description: 'Larga exposición del tráfico nocturno en la ciudad.' },
     { id: 4, type: 'image', src: 'https://picsum.photos/seed/filmmaker4/800/600', title: 'Quietud del Bosque', description: 'Rayos de sol atravesando el dosel.' },
-    { id: 5, type: 'video', src: 'https://youtube.com/shorts/3Mfa8JX42lc?si=04T0EwaAUVMtiQll', title: 'YouTube Shorts', description: 'Shorts de YouTube embebido en modal.' },
-    { id: 6, type: 'video', src: 'https://www.instagram.com/p/DPXVYDMkSYA/', title: 'Instagram Post', description: 'Publicación de Instagram embebida en modal.' },
+    {
+      id: 5,
+      type: 'embed',
+      title: 'YouTube Shorts Embed',
+      description: 'Embed directo de YouTube Shorts (iframe)',
+      embedHtml: `<iframe width="560" height="315" src="https://www.youtube.com/embed/3Mfa8JX42lc?si=DzdVxtvc5733Awb9" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
+    },
+    {
+      id: 6,
+      type: 'embed',
+      title: 'Instagram Reel Embed',
+      description: 'Embed de Instagram (blockquote).',
+      embedHtml: `<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DPXVYDMkSYA/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style=" background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"><div style="padding:16px;"> <a href="https://www.instagram.com/reel/DPXVYDMkSYA/?utm_source=ig_embed&amp;utm_campaign=loading" style=" background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank"> <div style=" display: flex; flex-direction: row; align-items: center;"> <div style="background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 40px; margin-right: 14px; width: 40px;"></div> <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center;"> <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; margin-bottom: 6px; width: 100px;"></div> <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; width: 60px;"></div></div></div><div style="padding: 19% 0;"></div> <div style="display:block; height:50px; margin:0 auto 12px; width:50px;"><svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g transform="translate(-511.000000, -20.000000)" fill="#000000"><g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g></svg></div><div style="padding-top: 8px;"> <div style=" color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">Ver esta publicación en Instagram</div></div><div style="padding: 12.5% 0;"></div> <div style="display: flex; flex-direction: row; margin-bottom: 14px; align-items: center;"><div> <div style="background-color: #F4F4F4; border-radius: 50%; height: 12.5px; width: 12.5px; transform: translateX(0px) translateY(7px);"></div> <div style="background-color: #F4F4F4; height: 12.5px; transform: rotate(-45deg) translateX(3px) translateY(1px); width: 12.5px; flex-grow: 0; margin-right: 14px; margin-left: 2px;"></div> <div style="background-color: #F4F4F4; border-radius: 50%; height: 12.5px; width: 12.5px; transform: translateX(9px) translateY(-18px);"></div></div><div style="margin-left: 8px;"> <div style=" background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 20px; width: 20px;"></div> <div style=" width: 0; height: 0; border-top: 2px solid transparent; border-left: 6px solid #f4f4f4; border-bottom: 2px solid transparent; transform: translateX(16px) translateY(-4px) rotate(30deg)"></div></div><div style="margin-left: auto;"> <div style=" width: 0px; border-top: 8px solid #F4F4F4; border-right: 8px solid transparent; transform: translateY(16px);"></div> <div style=" background-color: #F4F4F4; flex-grow: 0; height: 12px; width: 16px; transform: translateY(-4px);"></div> <div style=" width: 0; height: 0; border-top: 8px solid #F4F4F4; border-left: 8px solid transparent; transform: translateY(-4px) translateX(8px);"></div></div></div> <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center; margin-bottom: 24px;"> <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; margin-bottom: 6px; width: 224px;"></div> <div style=" background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; width: 144px;"></div></div></a><p style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; line-height:17px; margin-bottom:0; margin-top:8px; overflow:hidden; padding:8px 0 7px; text-align:center; text-overflow:ellipsis; white-space:nowrap;"><a href="https://www.instagram.com/reel/DPXVYDMkSYA/?utm_source=ig_embed&amp;utm_campaign=loading" style=" color:#c9c8cd; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:17px; text-decoration:none;" target="_blank">Una publicación compartida por El del Drone (@edwinbikes)</a></p></div></blockquote>`
+    },
     { id: 7, type: 'image', src: 'https://picsum.photos/seed/filmmaker6/800/600', title: 'Retrato de un Desconocido', description: 'Retrato espontáneo con luz natural.' },
   ];
 
-  // Helpers para detectar tipo de URL y construir embed / miniatura
-  const isYouTubeUrl = (url) => /(?:youtube\.com|youtu\.be)/i.test(url);
-  const isInstagramUrl = (url) => /instagram\.com\/p\//i.test(url);
-  const getYouTubeId = (url) => {
-    try {
-      // Manejar varios formatos: youtu.be/ID, youtube.com/watch?v=ID, youtube.com/shorts/ID
-      const u = new URL(url.startsWith('http') ? url : 'https://' + url);
-      if (u.hostname.includes('youtu.be')) return u.pathname.slice(1);
-      if (u.pathname.startsWith('/shorts/')) return u.pathname.split('/')[2] || u.pathname.split('/')[1];
-      return u.searchParams.get('v');
-    } catch (e) {
-      // fallback con regex
-      const m = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
-      return m ? m[1] : null;
-    }
-  };
-  const getYouTubeEmbedUrl = (url) => {
-    const id = getYouTubeId(url);
-    return id ? `https://www.youtube.com/embed/${id}?rel=0&showinfo=0` : null;
-  };
-  const getYouTubeThumbnail = (url) => {
-    const id = getYouTubeId(url);
-    return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
-  };
-  const getInstagramEmbedUrl = (url) => {
-    try {
-      const u = new URL(url.startsWith('http') ? url : 'https://' + url);
-      // extraer el path /p/SHORTCODE/
-      const parts = u.pathname.split('/').filter(Boolean);
-      const idx = parts.indexOf('p');
-      if (idx !== -1 && parts[idx + 1]) {
-        const shortcode = parts[idx + 1];
-        return `https://www.instagram.com/p/${shortcode}/embed`;
-      }
-      // fallback: devolver la url misma
-      return url;
-    } catch (e) {
-      return url;
-    }
-  };
-
-  // --- Crear el efecto cinematográfico (modal para video / embebidos) ---
-  const createVideoModal = (videoSrc) => {
-    // Añadimos estilos temporales para animaciones del modal
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-      .modal-fade-in { animation: fadeIn 0.18s ease-out forwards; }
-      .modal-iframe { width: 100%; height: 85vh; border: 0; background: #000; }
-      .modal-center { display:flex;align-items:center;justify-content:center;height:100%;width:100%; }
-    `;
-    document.head.appendChild(style);
-
-    const modalOverlay = document.createElement('div');
-    modalOverlay.className = 'modal-overlay';
-    Object.assign(modalOverlay.style, {
-      position: 'fixed',
-      inset: '0',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '1rem',
-      zIndex: '10000',
-      backgroundColor: 'rgba(0,0,0,0.9)',
-    });
-
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content modal-fade-in';
-    Object.assign(modalContent.style, {
-      maxWidth: '64rem',
-      width: '100%',
-      borderRadius: '12px',
-      overflow: 'hidden',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
-      background: '#000',
-      position: 'relative',
-    });
-
-    // botón de cierre
-    const closeButton = document.createElement('button');
-    closeButton.setAttribute('aria-label', 'Cerrar');
-    closeButton.title = 'Cerrar';
-    closeButton.innerHTML = '&times;';
-    Object.assign(closeButton.style, {
-      position: 'absolute',
-      top: '8px',
-      right: '8px',
-      zIndex: '20',
-      height: '40px',
-      width: '40px',
-      borderRadius: '9999px',
-      background: 'rgba(0,0,0,0.5)',
-      color: 'white',
-      border: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '22px',
-      cursor: 'pointer',
-    });
-
-    // Área central donde colocamos iframe o <video>
-    const center = document.createElement('div');
-    center.className = 'modal-center';
-    Object.assign(center.style, {
-      width: '100%',
-      background: '#000',
-    });
-
-    // Determinar si es YouTube / Instagram / mp4
-    let embedded = false;
-    if (isYouTubeUrl(videoSrc)) {
-      const embed = getYouTubeEmbedUrl(videoSrc);
-      if (embed) {
-        const iframe = document.createElement('iframe');
-        iframe.src = embed + '&autoplay=1';
-        iframe.className = 'modal-iframe';
-        iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
-        iframe.allowFullscreen = true;
-        center.appendChild(iframe);
-        embedded = true;
-      }
-    } else if (isInstagramUrl(videoSrc)) {
-      const embed = getInstagramEmbedUrl(videoSrc);
-      // Instagram embed often works inside an iframe (and may inject scripts). We attempt to embed.
-      const iframe = document.createElement('iframe');
-      iframe.src = embed;
-      iframe.className = 'modal-iframe';
-      iframe.allow = 'encrypted-media; picture-in-picture';
-      iframe.allowFullscreen = true;
-      center.appendChild(iframe);
-      embedded = true;
-    }
-
-    if (!embedded) {
-      // intentar usar etiqueta video para mp4 u otros formatos directos
-      const video = document.createElement('video');
-      video.src = videoSrc;
-      video.controls = true;
-      video.playsInline = true;
-      video.style.width = '100%';
-      video.style.maxHeight = '85vh';
-      video.style.background = '#000';
-      video.autoplay = true;
-      center.appendChild(video);
-    }
-
-    modalContent.appendChild(closeButton);
-    modalContent.appendChild(center);
-    modalOverlay.appendChild(modalContent);
-    document.body.appendChild(modalOverlay);
-
-    // evitar scroll en el fondo
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    const close = () => {
-      try {
-        // detener video si existe
-        const v = modalContent.querySelector('video');
-        if (v && !v.paused) {
-          try { v.pause(); } catch (e) {}
-        }
-        modalOverlay.remove();
-        style.remove();
-        document.body.style.overflow = prevOverflow || '';
-        document.removeEventListener('keydown', onKeyDown);
-      } catch (err) {
-        document.body.style.overflow = prevOverflow || '';
-        try { modalOverlay.remove(); } catch (e) {}
-        try { style.remove(); } catch (e) {}
-        document.removeEventListener('keydown', onKeyDown);
-      }
-    };
-
-    const onKeyDown = (e) => {
-      if (e.key === 'Escape') close();
-    };
-
-    closeButton.addEventListener('click', close);
-    modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) close();
-    });
-    document.addEventListener('keydown', onKeyDown);
-  };
-
-  // Renderizar la cuadrícula
+  // Obtener contenedor de la cuadrícula
   const portfolioGrid = document.querySelector('#portfolio-section .grid');
   if (!portfolioGrid) {
     console.warn('No se encontró el selector "#portfolio-section .grid". Comprueba que el HTML tenga esa estructura.');
     return;
   }
 
+  // Añadimos estilos útiles para embeds (responsivo dentro de la tarjeta)
+  const style = document.createElement('style');
+  style.textContent = `
+    .media-card { position: relative; overflow: hidden; border-radius: 8px; background: #111; transition: transform .25s; }
+    .media-card .media-info { position: absolute; bottom: 0; left: 0; padding: 1rem; width: 100%; box-sizing: border-box; pointer-events: none; }
+    .media-card .media-desc { margin: 0; margin-top: .25rem; color: #d1d5db; opacity: 0; transition: opacity .25s; }
+    .embed-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
+    .embed-wrapper iframe { width: 100%; height: 100%; border: 0; }
+    /* Para Instagram el blockquote puede ocupar más alto; permitimos scroll dentro de la tarjeta si es necesario */
+    .embed-wrapper .instagram-media { width: 100% !important; height: auto !important; max-height: 100%; display: block; overflow: auto; }
+  `;
+  document.head.appendChild(style);
+
+  // Renderizar elementos
   mediaItems.forEach(item => {
-    const div = document.createElement('div');
-    div.className = "media-card group relative overflow-hidden rounded-lg shadow-lg cursor-pointer transform transition-transform duration-300";
-    Object.assign(div.style, {
-      position: 'relative',
-      overflow: 'hidden',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      height: '16rem',
-      transition: 'transform 0.25s',
-      background: '#111',
-    });
+    const wrapper = document.createElement('div');
+    wrapper.className = 'media-card';
+    wrapper.style.height = '16rem';
+    wrapper.style.cursor = 'default';
+    wrapper.style.margin = '8px';
 
-    // Para videos que no sean mp4 mostramos una miniatura (thumbnail) y un overlay de play
-    let mediaHTML = '';
-    if (item.type === 'video') {
-      if (isYouTubeUrl(item.src)) {
-        const thumb = getYouTubeThumbnail(item.src) || 'https://via.placeholder.com/800x600.png?text=Video';
-        mediaHTML = `
-          <img class="media-thumb" src="${thumb}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;">
-          <div class="play-overlay" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="white" style="opacity:0.95;">
-              <path d="M3 22v-20l18 10-18 10z"></path>
-            </svg>
-          </div>
-        `;
-      } else if (isInstagramUrl(item.src)) {
-        const thumb = 'https://via.placeholder.com/800x600.png?text=Instagram+Video';
-        mediaHTML = `
-          <img class="media-thumb" src="${thumb}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;">
-          <div class="play-overlay" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="white" style="opacity:0.95;">
-              <path d="M3 22v-20l18 10-18 10z"></path>
-            </svg>
-          </div>
-        `;
-      } else {
-        // Asumimos MP4 u otro formato compatible con <video>
-        mediaHTML = `
-          <video class="media-video" src="${item.src}" muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;"></video>
-        `;
-      }
-    } else {
-      mediaHTML = `
-        <img class="media-image" src="${item.src}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;">
+    if (item.type === 'image') {
+      wrapper.innerHTML = `
+        <img src="${item.src}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.7));pointer-events:none;"></div>
+        <div class="media-info">
+          <h3 style="margin:0;font-size:1.125rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</h3>
+          <p class="media-desc">${item.description}</p>
+        </div>
       `;
-    }
-
-    div.innerHTML = `
-      ${mediaHTML}
-      <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.7));pointer-events:none;"></div>
-      <div style="position:absolute;bottom:0;left:0;padding:1rem;width:100%;box-sizing:border-box;">
-        <h3 style="margin:0;font-size:1.125rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</h3>
-        <p class="media-desc" style="margin:0;margin-top:0.25rem;color:#d1d5db;opacity:0;transition:opacity .25s;">${item.description}</p>
-      </div>
-    `;
-
-    // Comportamientos
-    if (item.type === 'video') {
-      // Si es MP4 reproducir en hover, si es Youtube/Instagram solo mostrar miniatura y abrir modal al click
-      const videoEl = div.querySelector('video.media-video');
-      if (videoEl) {
-        const p = div.querySelector('.media-desc');
-        div.addEventListener('mouseenter', () => {
-          try {
-            videoEl.muted = true;
-            videoEl.loop = true;
-            const playPromise = videoEl.play();
-            if (playPromise && typeof playPromise.then === 'function') playPromise.catch(()=>{});
-          } catch (e) {}
-          if (p) p.style.opacity = '1';
-        });
-        div.addEventListener('mouseleave', () => {
-          try { videoEl.pause(); videoEl.currentTime = 0; } catch (e) {}
-          if (p) p.style.opacity = '0';
-        });
-        div.addEventListener('click', () => createVideoModal(item.src));
-      } else {
-        // thumbnail (YouTube / Instagram)
-        div.addEventListener('mouseenter', () => {
-          const img = div.querySelector('img');
-          if (img) img.style.transform = 'scale(1.05)';
-          const p = div.querySelector('.media-desc'); if (p) p.style.opacity = '1';
-        });
-        div.addEventListener('mouseleave', () => {
-          const img = div.querySelector('img');
-          if (img) img.style.transform = 'scale(1)';
-          const p = div.querySelector('.media-desc'); if (p) p.style.opacity = '0';
-        });
-        div.addEventListener('click', () => createVideoModal(item.src));
-      }
-    } else {
-      // imagen
-      div.addEventListener('mouseenter', () => {
-        const img = div.querySelector('.media-image');
-        if (img) img.style.transform = 'scale(1.05)';
-        const p = div.querySelector('.media-desc'); if (p) p.style.opacity = '1';
+      wrapper.addEventListener('mouseenter', () => {
+        const img = wrapper.querySelector('img'); if (img) img.style.transform = 'scale(1.05)';
+        const p = wrapper.querySelector('.media-desc'); if (p) p.style.opacity = '1';
       });
-      div.addEventListener('mouseleave', () => {
-        const img = div.querySelector('.media-image');
-        if (img) img.style.transform = 'scale(1)';
-        const p = div.querySelector('.media-desc'); if (p) p.style.opacity = '0';
+      wrapper.addEventListener('mouseleave', () => {
+        const img = wrapper.querySelector('img'); if (img) img.style.transform = 'scale(1)';
+        const p = wrapper.querySelector('.media-desc'); if (p) p.style.opacity = '0';
+      });
+    } else if (item.type === 'embed') {
+      // Mostramos el embed tal cual dentro de un contenedor responsivo
+      wrapper.style.cursor = 'pointer';
+      wrapper.innerHTML = `
+        <div class="embed-wrapper">
+          ${item.embedHtml}
+        </div>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.35));pointer-events:none;"></div>
+        <div class="media-info">
+          <h3 style="margin:0;font-size:1.125rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</h3>
+          <p class="media-desc">${item.description}</p>
+        </div>
+      `;
+
+      // No intentamos reproducir en hover; sólo añadimos efectos visuales para ver el embed
+      wrapper.addEventListener('mouseenter', () => {
+        const p = wrapper.querySelector('.media-desc'); if (p) p.style.opacity = '1';
+        const emb = wrapper.querySelector('iframe, .instagram-media, video, img'); if (emb) emb.style.transform = 'scale(1.01)';
+      });
+      wrapper.addEventListener('mouseleave', () => {
+        const p = wrapper.querySelector('.media-desc'); if (p) p.style.opacity = '0';
+        const emb = wrapper.querySelector('iframe, .instagram-media, video, img'); if (emb) emb.style.transform = 'scale(1)';
+      });
+      // Si el usuario hace click podemos abrir el embed en una nueva pestaña (opcional)
+      wrapper.addEventListener('click', (e) => {
+        // para iframes de YouTube abrimos la url del src en nueva pestaña (sin autoplay params)
+        const iframe = wrapper.querySelector('iframe');
+        if (iframe && iframe.src) {
+          window.open(iframe.src.split('?')[0], '_blank');
+        } else {
+          // si es instagram, abrimos el permalink
+          const block = wrapper.querySelector('.instagram-media');
+          if (block) {
+            const permalink = block.getAttribute('data-instgrm-permalink');
+            if (permalink) window.open(permalink, '_blank');
+          }
+        }
       });
     }
 
-    portfolioGrid.appendChild(div);
+    portfolioGrid.appendChild(wrapper);
   });
+
+  // Cargar el script de Instagram embed si hay algún embed de instagram
+  const hasInstagram = mediaItems.some(i => i.type === 'embed' && /instagram\.com\/(p|reel)/i.test(i.embedHtml));
+  if (hasInstagram) {
+    // Cargar solo una vez y de forma async
+    if (!document.querySelector('script[src="//www.instagram.com/embed.js"]') && !document.querySelector('script[src="https://www.instagram.com/embed.js"]')) {
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = '//www.instagram.com/embed.js';
+      s.onload = () => {
+        // si la librería ya existe, llamar a window.instgrm.Embeds.process() para procesar blockquotes
+        try { if (window.instgrm && typeof window.instgrm.Embeds !== 'undefined' && typeof window.instgrm.Embeds.process === 'function') window.instgrm.Embeds.process(); } catch (e) { /* ignore */ }
+      };
+      document.body.appendChild(s);
+    } else {
+      // ya existe el script, forzamos re-procesado por si fuera necesario
+      try { if (window.instgrm && typeof window.instgrm.Embeds !== 'undefined' && typeof window.instgrm.Embeds.process === 'function') window.instgrm.Embeds.process(); } catch (e) { /* ignore */ }
+    }
+  }
+
 });
