@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const mediaItems = [
     { id: 1, type: 'image', src: 'https://picsum.photos/seed/filmmaker1/800/600', title: 'Amanecer en las montañas', description: 'Una toma matutina capturando la niebla y los primeros rayos.' },
     // Para videos uso un mp4 público de ejemplo (Big Buck Bunny). Reemplaza por tus URLs reales si las tienes.
-    { id: 2, type: 'video', src: 'https://youtu.be/tysOO8fFFx8?si=nN7X9wQJpBOygUKe', title: 'El Aliento del Océano', description: 'Captura en cámara lenta de olas rompiendo en la costa.' },
+    { id: 2, type: 'video', src: 'https://www.instagram.com/reel/DP-Ep3LkaXB', title: 'El Aliento del Océano', description: 'Captura en cámara lenta de olas rompiendo en la costa.' },
     { id: 3, type: 'image', src: 'https://picsum.photos/seed/filmmaker3/800/600', title: 'Jungla Urbana', description: 'Larga exposición del tráfico nocturno en la ciudad.' },
     { id: 4, type: 'image', src: 'https://picsum.photos/seed/filmmaker4/800/600', title: 'Quietud del Bosque', description: 'Rayos de sol atravesando el dosel.' },
     { id: 5, type: 'video', src: 'https://www.w3schools.com/html/mov_bbb.mp4', title: 'Espejismo del Desierto', description: 'Planos amplios que muestran la inmensidad y calor.' },
