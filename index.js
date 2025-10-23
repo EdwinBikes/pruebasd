@@ -101,6 +101,125 @@ document.addEventListener('DOMContentLoaded', () => {
     mo.observe(document.body, { childList: true, subtree: true });
   };
 
+  // --- Helpers para mostrar solo el video de Instagram si se inyecta un <video> (blob:) en el DOM ---
+  (function setupInstagramVideoExtraction() {
+    // estilos para el contenedor "solo video"
+    const s = document.createElement('style');
+    s.textContent = `
+      .ig-video-only {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #000;
+        position: relative;
+      }
+      .ig-video-only video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    `;
+    document.head.appendChild(s);
+
+    // intenta reemplazar el blockquote/embebido por solo el video si el node contiene un <video>
+    function extractVideoFromInstagramEmbed(block) {
+      try {
+        // buscar video en el propio bloque (caso en que Instagram injeta <video> en el documento)
+        const vid = block.querySelector('video');
+        if (!vid) return false;
+
+        // Si ya hemos procesado este block, saltar
+        if (block.dataset.igVideoProcessed === '1') return true;
+
+        // crear contenedor limpio
+        const container = document.createElement('div');
+        container.className = 'ig-video-only';
+
+        // clonar el video (clonar suele ser más seguro que moverlo; mantiene el src blob)
+        const clone = vid.cloneNode(true);
+        // permitir controles y reproducción inline; mute si quieres autoplay silencioso
+        clone.controls = true;
+        clone.playsInline = true;
+        // si quieres autoplay sin interacción descomenta:
+        // clone.muted = true; clone.autoplay = true;
+
+        // limpiar el bloque y poner sólo el video
+        block.innerHTML = '';
+        block.appendChild(container);
+        container.appendChild(clone);
+
+        // marcar como procesado
+        block.dataset.igVideoProcessed = '1';
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // Recorre todos los blockquotes de instagram y trata de extraer video
+    function processAllInstagramBlocks() {
+      const blocks = document.querySelectorAll('blockquote.instagram-media, .instagram-media');
+      blocks.forEach(b => {
+        const ok = extractVideoFromInstagramEmbed(b);
+        if (!ok) {
+          // fallback: si no contiene video (probablemente hay un iframe), aplicamos estilos de recorte si quieres
+          // (aquí sólo aseguramos que ocupe el 100% del contenedor)
+          const iframe = b.querySelector('iframe');
+          if (iframe) {
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.display = 'block';
+            // dejamos la lógica de recorte previa en caso de que quieras ocultar cabecera:
+            // iframe.style.position = 'absolute' ... (si ya tienes recorte, se conservará)
+          }
+        }
+      });
+    }
+
+    // Observador para detectar inyecciones dinámicas (Instagram procesa el blockquote de forma asíncrona)
+    const mo = new MutationObserver((mutations) => {
+      let found = false;
+      for (const m of mutations) {
+        if (m.addedNodes && m.addedNodes.length) {
+          for (const n of m.addedNodes) {
+            if (n.nodeType === 1 && (n.matches && (n.matches('blockquote.instagram-media') || n.matches('.instagram-media')) || n.querySelector && (n.querySelector('video') || n.querySelector('iframe')))) {
+              found = true;
+              break;
+            }
+          }
+        }
+      }
+      if (found) {
+        // darle un pequeño delay para que el script de Instagram termine de inyectar el <video>
+        setTimeout(processAllInstagramBlocks, 300);
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    // Llamada inicial por si ya están presentes
+    window.addEventListener('load', () => {
+      // si ya cargó el script de Instagram, pedirle que procese y después intentar extraer
+      try {
+        if (window.instgrm && window.instgrm.Embeds && typeof window.instgrm.Embeds.process === 'function') {
+          window.instgrm.Embeds.process();
+          setTimeout(processAllInstagramBlocks, 350);
+        } else {
+          // si no existe, igual intentamos procesar después de un timeout
+          setTimeout(processAllInstagramBlocks, 600);
+        }
+      } catch (e) {
+        setTimeout(processAllInstagramBlocks, 600);
+      }
+    });
+
+    // Exponer función por si quieres llamarla manualmente desde consola o desde otra parte
+    window.extractInstagramVideosToStandalone = processAllInstagramBlocks;
+  })();
+
   // Renderizar elementos
   mediaItems.forEach(item => {
     const wrapper = document.createElement('div');
@@ -195,5 +314,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     observeInstagramEmbeds();
   }
-
 });
