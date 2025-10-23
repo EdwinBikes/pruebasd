@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-   const mediaItems = [
+  // mediaItems con tus embeds (iframes / blockquote) tal como los pegaste
+  const mediaItems = [
     { id: 1, type: 'image', src: 'https://picsum.photos/seed/filmmaker1/800/600', title: 'Amanecer en las montañas', description: 'Una toma matutina capturando la niebla y los primeros rayos.' },
     {
       id: 2,
@@ -37,15 +38,68 @@ document.addEventListener('DOMContentLoaded', () => {
   // Añadimos estilos útiles para embeds (responsivo dentro de la tarjeta)
   const style = document.createElement('style');
   style.textContent = `
-    .media-card { position: relative; overflow: hidden; border-radius: 8px; background: #111; transition: transform .25s; }
+    .media-card { position: relative; overflow: hidden; border-radius: 8px; background: #111; transition: transform .25s; display:block; }
     .media-card .media-info { position: absolute; bottom: 0; left: 0; padding: 1rem; width: 100%; box-sizing: border-box; pointer-events: none; }
     .media-card .media-desc { margin: 0; margin-top: .25rem; color: #d1d5db; opacity: 0; transition: opacity .25s; }
-    .embed-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }
-    .embed-wrapper iframe { width: 100%; height: 100%; border: 0; }
-    /* Para Instagram el blockquote puede ocupar más alto; permitimos scroll dentro de la tarjeta si es necesario */
-    .embed-wrapper .instagram-media { width: 100% !important; height: auto !important; max-height: 100%; display: block; overflow: auto; }
+    .embed-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; position: relative; }
+    .embed-wrapper iframe { position: relative; width: 100%; height: 100%; border: 0; display: block; transition: transform .25s; }
+    /* Estilos para recortar visualmente instagram iframes: el ajuste final se aplica vía JS tras inyectar el iframe */
+    .instagram-cropper { overflow: hidden; position: relative; width: 100%; height: 100%; }
   `;
   document.head.appendChild(style);
+
+  // Función que ajusta/recorta iframes de Instagram para que se vea principalmente el vídeo
+  const adjustInstagramIframes = () => {
+    // Buscar iframes que apunten a instagram
+    const iframes = Array.from(document.querySelectorAll('iframe')).filter(f => f.src && f.src.includes('instagram.com'));
+    iframes.forEach(iframe => {
+      // envolver en un contenedor si no está ya dentro del nuestro
+      let parent = iframe.parentElement;
+      // asegurarnos de que el wrapper más cercano tenga overflow:hidden (podría ser .embed-wrapper o similar)
+      let wrapper = parent.closest('.embed-wrapper') || parent;
+      wrapper.classList.add('instagram-cropper');
+      wrapper.style.overflow = 'hidden';
+      wrapper.style.position = 'relative';
+      wrapper.style.height = wrapper.style.height || wrapper.parentElement && wrapper.parentElement.style.height ? wrapper.parentElement.style.height : '100%';
+
+      // Estilo visual: hacemos que el iframe sea más alto que el contenedor y lo desplazamos hacia arriba
+      // para ocultar la cabecera (usuario / follow). Los valores son heurísticos y pueden ajustarse.
+      iframe.style.position = 'absolute';
+      iframe.style.left = '50%';
+      iframe.style.top = '-64px';              // desplazar hacia arriba para ocultar la cabecera
+      iframe.style.transform = 'translateX(-50%)';
+      iframe.style.width = '120%';             // hacerlo un poco más ancho para mantener proporción sin cortar los laterales
+      iframe.style.height = 'calc(100% + 128px)'; // aumentar la altura para que el video no se corte
+      iframe.style.maxHeight = 'none';
+      iframe.style.minHeight = '600px';        // si quieres limitar, ajusta este valor
+      iframe.style.transition = 'transform .25s, top .25s, width .25s, height .25s';
+      // marcar para evitar re-aplicar
+      iframe.dataset.instagramCropped = '1';
+    });
+  };
+
+  // Helper: observar DOM para aplicar el recorte cuando instagram inyecte si corresponde
+  const observeInstagramEmbeds = () => {
+    const mo = new MutationObserver((mutations) => {
+      let changed = false;
+      for (const m of mutations) {
+        if (m.addedNodes && m.addedNodes.length) {
+          for (const n of m.addedNodes) {
+            if (n.nodeType === 1 && (n.tagName.toLowerCase() === 'iframe' || n.querySelector && (n.querySelector('iframe') || n.querySelector('.instagram-media')))) {
+              changed = true;
+            }
+          }
+        }
+      }
+      if (changed) {
+        // dar un pequeño delay para que el iframe termine de renderizarse
+        setTimeout(() => {
+          try { adjustInstagramIframes(); } catch (e) { /* ignore */ }
+        }, 300);
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+  };
 
   // Renderizar elementos
   mediaItems.forEach(item => {
@@ -86,23 +140,18 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      // No intentamos reproducir en hover; sólo añadimos efectos visuales para ver el embed
       wrapper.addEventListener('mouseenter', () => {
         const p = wrapper.querySelector('.media-desc'); if (p) p.style.opacity = '1';
-        const emb = wrapper.querySelector('iframe, .instagram-media, video, img'); if (emb) emb.style.transform = 'scale(1.01)';
       });
       wrapper.addEventListener('mouseleave', () => {
         const p = wrapper.querySelector('.media-desc'); if (p) p.style.opacity = '0';
-        const emb = wrapper.querySelector('iframe, .instagram-media, video, img'); if (emb) emb.style.transform = 'scale(1)';
       });
-      // Si el usuario hace click podemos abrir el embed en una nueva pestaña (opcional)
       wrapper.addEventListener('click', (e) => {
-        // para iframes de YouTube abrimos la url del src en nueva pestaña (sin autoplay params)
+        // abrir en nueva pestaña el src del iframe (si existe) o el permalink del blockquote
         const iframe = wrapper.querySelector('iframe');
         if (iframe && iframe.src) {
           window.open(iframe.src.split('?')[0], '_blank');
         } else {
-          // si es instagram, abrimos el permalink
           const block = wrapper.querySelector('.instagram-media');
           if (block) {
             const permalink = block.getAttribute('data-instgrm-permalink');
@@ -124,14 +173,27 @@ document.addEventListener('DOMContentLoaded', () => {
       s.async = true;
       s.src = '//www.instagram.com/embed.js';
       s.onload = () => {
-        // si la librería ya existe, llamar a window.instgrm.Embeds.process() para procesar blockquotes
-        try { if (window.instgrm && typeof window.instgrm.Embeds !== 'undefined' && typeof window.instgrm.Embeds.process === 'function') window.instgrm.Embeds.process(); } catch (e) { /* ignore */ }
+        try {
+          if (window.instgrm && typeof window.instgrm.Embeds !== 'undefined' && typeof window.instgrm.Embeds.process === 'function') {
+            window.instgrm.Embeds.process();
+            // aplicar recorte con un pequeño delay para que iframes estén listos
+            setTimeout(adjustInstagramIframes, 350);
+          }
+        } catch (e) { /* ignore */ }
       };
       document.body.appendChild(s);
     } else {
-      // ya existe el script, forzamos re-procesado por si fuera necesario
-      try { if (window.instgrm && typeof window.instgrm.Embeds !== 'undefined' && typeof window.instgrm.Embeds.process === 'function') window.instgrm.Embeds.process(); } catch (e) { /* ignore */ }
+      try {
+        if (window.instgrm && typeof window.instgrm.Embeds !== 'undefined' && typeof window.instgrm.Embeds.process === 'function') {
+          window.instgrm.Embeds.process();
+          setTimeout(adjustInstagramIframes, 350);
+        } else {
+          // si el script ya está cargado pero no disponible aún, intentamos ajustarlo igual tras un delay
+          setTimeout(adjustInstagramIframes, 600);
+        }
+      } catch (e) { setTimeout(adjustInstagramIframes, 600); }
     }
+    observeInstagramEmbeds();
   }
 
 });
